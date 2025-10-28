@@ -10,14 +10,70 @@ generator client {
 }
 
 datasource db {
-  provider = "mongodb"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  email     String   @unique
-  name      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model Student {
+  id           Int        @id @default(autoincrement())
+  student_code Int        @unique
+  firstname    String
+  lastname     String
+  id_card      Int
+  password     String     @unique
+  classGroupId Int
+  classGroup   ClassGroup @relation(fields: [classGroupId], references: [id])
+}
+
+model Level {
+  id         Int          @id @default(autoincrement())
+  name       String
+  ClassGroup ClassGroup[]
+}
+
+model Teacher {
+  id           Int         @id @default(autoincrement())
+  techer_code  Int         @unique
+  title        String
+  firstname    String
+  lastname     String
+  id_card      Int
+  password     String      @unique
+  classGroupId Int
+  classGroup   ClassGroup  @relation(fields: [classGroupId], references: [id])
+  StudyPlan    StudyPlan[]
+}
+
+model ClassGroup {
+  id              Int         @id @default(autoincrement())
+  courseGroupCode Int         @unique
+  courseGroupName String
+  level           Int
+  levelyear       Int
+  Student         Student[]
+  Teacher         Teacher[]
+  StudyPlan       StudyPlan[]
+  lever           Level       @relation(fields: [level], references: [id])
+}
+
+model StudyPlan {
+  id           Int        @id @default(autoincrement())
+  semester     Int
+  year         Int
+  classGroupId Int
+  subject_id   Int
+  teacher_id   Int
+  classGroup   ClassGroup @relation(fields: [classGroupId], references: [id])
+  subject      Subject    @relation(fields: [subject_id], references: [id])
+  teacher      Teacher    @relation(fields: [teacher_id], references: [id])
+}
+
+model Subject {
+  id          Int         @id @default(autoincrement())
+  subjectCode Int
+  SubjectName String
+  credit      Int
+  hour_t      Int
+  hour_p      Int
+  StudyPlan   StudyPlan[]
 }
